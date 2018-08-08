@@ -33,7 +33,14 @@
                             <outlet property="prefetchDataSource" destination="CrF-PU-QhI" id="0dc-eQ-gZR"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Do It." id="Ohn-0X-pkF"/>
+                    <navigationItem key="navigationItem" title="Do It." id="Ohn-0X-pkF">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="ytz-aQ-5cT">
+                            <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <connections>
+                                <action selector="addButtonPressed:" destination="CrF-PU-QhI" id="mBF-8x-KG0"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="elt-bf-IsC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
