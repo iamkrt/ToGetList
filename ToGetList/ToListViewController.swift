@@ -12,9 +12,15 @@ class ToListViewController: UITableViewController {
 
     var itemArray = [""]
     
+    let defaults = UserDefaults.standard
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        if let items = defaults.array(forKey: "itemListArray") as? [String] {
+            itemArray = items
+        }
+        
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -51,8 +57,12 @@ class ToListViewController: UITableViewController {
             // what will happen when the user clicks the button
             self.itemArray.append(textField.text ?? "nothing here") // if field is nil give a default value
             
+            self.defaults.set(self.itemArray, forKey: "itemListArray")
+            
            self.tableView.reloadData()
         }
+        
+        // adding a text field in action
         
         alert.addTextField { (addItemText) in
             addItemText.placeholder = "Create a new entry"
