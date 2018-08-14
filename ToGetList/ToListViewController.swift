@@ -10,23 +10,42 @@ import UIKit
 
 class ToListViewController: UITableViewController {
 
-    var itemArray = [""]
+    var itemArray = [Item]()
     
     let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let items = defaults.array(forKey: "itemListArray") as? [String] {
-            itemArray = items
-        }
+        // first stands for grabbing the first item since it's an array
+       
+        
+       loadItems()
+        
+
+//          if let items = defaults.array(forKey: "itemListArray") as? [Item] {
+//            itemArray = items
+//        }
         
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
         
-        cell.textLabel?.text = itemArray[indexPath.row]
+        let item = itemArray[indexPath.row]
+        
+        cell.textLabel?.text = item.title
+        
+        // set the cell.acc type to check if item.done is true.
+        
+        if itemArray[indexPath.row].done == true {
+            cell.accessoryType = .checkmark
+        } else if itemArray[indexPath.row].done == false {
+            cell.accessoryType = .none
+        }
+      
         
         return cell
     }
@@ -38,13 +57,13 @@ class ToListViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print(itemArray[indexPath.row])
         
+       itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        self.saveItems()
+        
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        print(itemArray[indexPath.row].done)
     }
 
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
@@ -55,9 +74,13 @@ class ToListViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
             // what will happen when the user clicks the button
-            self.itemArray.append(textField.text ?? "nothing here") // if field is nil give a default value
             
-            self.defaults.set(self.itemArray, forKey: "itemListArray")
+           let newItem = Item()
+            newItem.title = textField.text!
+            
+            self.itemArray.append(newItem) // if field is nil give a default value
+            
+            self.saveItems()
             
            self.tableView.reloadData()
         }
@@ -73,5 +96,33 @@ class ToListViewController: UITableViewController {
         present(alert, animated: true, completion: nil)
         
     }
+    
+    func saveItems() {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print(error.localizedDescription)
+        }
+
+        
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            
+            do {
+            itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("error in decoding \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
 }
 
